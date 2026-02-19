@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="{{ asset('css/shop.css') }}">
     <link rel="stylesheet" href="{{ asset('css/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css/contact.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/footer.css') }}">
     
 
 
@@ -25,5 +26,27 @@
         @yield('content')
     </main>
 
+    @include('partials.footer')
+
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @if(session('success'))
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: "{{ session('success') }}",
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+        background: '#fff',
+        iconColor: '#27ae60',
+        customClass: {
+            title: 'swal-title-custom'
+        }
+    });
+</script>
+@endif
 </body>
 </html>

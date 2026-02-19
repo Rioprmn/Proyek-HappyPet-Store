@@ -39,38 +39,80 @@
     font-size: 15px;
     font-weight: 500;
     padding: 8px 0;
-    transition: color 0.3s ease;
+    transition: all 0.3s ease;
+    display: inline-block;
 }
 
-.nav-menu a:hover {
+/* --- State Active & Hover --- */
+.nav-menu a:hover, 
+.nav-menu a.active {
     color: #38b2ac;
 }
 
-/* Dropdown */
+/* Garis bawah untuk menu yang aktif */
+.nav-menu a::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0; /* Default lebar 0 */
+    height: 2px;
+    background-color: #38b2ac;
+    transition: width 0.3s ease;
+}
+
+/* Tampilkan garis jika hover atau active */
+.nav-menu a:hover::after,
+.nav-menu a.active::after {
+    width: 100%;
+}
+
+/* Pengecualian: Garis bawah tidak perlu untuk link di dalam dropdown */
+.dropdown-menu a::after {
+    display: none;
+}
+
+/* --- Dropdown --- */
 .dropdown-menu {
     position: absolute;
-    top: 120%;
+    top: 100%; /* Disesuaikan agar lebih rapat */
     left: 0;
     background-color: #ffffff;
     border: 1px solid #e5e7eb;
-    min-width: 160px;
-    padding: 10px 0;
+    min-width: 180px;
+    padding: 8px 0;
     display: none;
-    border-radius: 6px;
+    border-radius: 8px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); /* Tambah shadow agar melayang */
+    animation: fadeIn 0.2s ease-out; /* Animasi muncul halus */
 }
 
 .dropdown-menu li a {
     display: block;
-    padding: 10px 16px;
+    padding: 10px 20px;
     color: #374151;
     font-size: 14px;
+    width: 100%;
 }
 
 .dropdown-menu li a:hover {
     background-color: #f0fdf4;
+    color: #38b2ac;
 }
 
 /* Show dropdown */
 .dropdown:hover .dropdown-menu {
     display: block;
+}
+
+/* Animasi Fade In untuk Dropdown */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
