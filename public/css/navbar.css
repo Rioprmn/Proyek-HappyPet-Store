@@ -1,0 +1,76 @@
+/* =========================
+   NAVBAR STYLES
+   ========================= */
+
+.navbar {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 70px;
+}
+
+/* Logo */
+.logo a {
+    font-size: 22px;
+    font-weight: 700;
+    color: #38b2ac;
+}
+
+/* Menu */
+.nav-menu {
+    display: flex;
+    gap: 24px;
+}
+
+.nav-menu li {
+    position: relative;
+}
+
+.nav-menu a {
+    color: #374151;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 8px 0;
+    transition: color 0.3s ease;
+}
+
+.nav-menu a:hover {
+    color: #38b2ac;
+}
+
+/* Dropdown */
+.dropdown-menu {
+    position: absolute;
+    top: 120%;
+    left: 0;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    min-width: 160px;
+    padding: 10px 0;
+    display: none;
+    border-radius: 6px;
+}
+
+.dropdown-menu li a {
+    display: block;
+    padding: 10px 16px;
+    color: #374151;
+    font-size: 14px;
+}
+
+.dropdown-menu li a:hover {
+    background-color: #f0fdf4;
+}
+
+/* Show dropdown */
+.dropdown:hover .dropdown-menu {
+    display: block;
+}

@@ -1,0 +1,21 @@
+/* =========================
+   ABOUT PAGE
+   ========================= */
+
+.about {
+    padding: 80px 0;
+    background-color: #ffffff;
+}
+
+.about h1 {
+    font-size: 32px;
+    margin-bottom: 24px;
+    color: #1f2937;
+}
+
+.about p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #4b5563;
+    margin-bottom: 16px;
+}
