@@ -7,56 +7,68 @@ use App\Models\Category;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\File; // Tambahkan ini untuk hapus file gambar
+use Illuminate\Support\Facades\File;
 
 class AdminController extends Controller
 {
     // --- 1. DASHBOARD ---
     public function dashboard()
-{
-    $totalProducts = Product::count();
-    $totalStock = Product::sum('stock');
-    
-    // Data untuk Chart: Menghitung jumlah produk tiap kategori
-    $categories = Category::all();
-    $chartLabels = [];
-    $chartCounts = [];
-    
-    foreach($categories as $cat) {
-        $chartLabels[] = $cat->name;
-        $chartCounts[] = Product::where('category', $cat->name)->count();
+    {
+        $totalProducts = Product::count();
+        $totalStock = Product::sum('stock');
+        $totalOrders = Order::count();
+        $totalRevenue = Order::where('status', 'completed')->sum('total_price');
+        
+        $categories = Category::all();
+        $chartLabels = [];
+        $chartCounts = [];
+        foreach($categories as $cat) {
+            $chartLabels[] = $cat->name;
+            $chartCounts[] = Product::where('category', $cat->name)->count();
+        }
+
+        $salesLabels = [];
+        $salesData = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i);
+            $salesLabels[] = $date->format('d M');
+            $salesData[] = Order::where('status', 'completed')
+                            ->whereDate('created_at', $date)
+                            ->sum('total_price');
+        }
+
+        $chartData = [
+            'labels' => $chartLabels,
+            'counts' => $chartCounts,
+            'salesLabels' => $salesLabels,
+            'salesData' => $salesData
+        ];
+        
+        return view('admin.dashboard', compact('totalProducts', 'totalStock', 'totalOrders', 'totalRevenue', 'chartData'));
     }
 
-    $chartData = [
-        'labels' => $chartLabels,
-        'counts' => $chartCounts
-    ];
-    
-    return view('admin.dashboard', compact('totalProducts', 'totalStock', 'chartData'));
-}
-
-    // --- 2. PRODUK (PRODUCT) ---
-
-    public function productList()
+    // --- 2. PRODUK ---
+    public function productList(Request $request)
     {
-        $products = Product::latest()->get(); 
-        return view('admin.product-list', compact('products'));
+        $categories = Category::all();
+        $query = Product::query();
+        if ($request->has('category') && $request->category != '') {
+            $query->where('category', $request->category);
+        }
+        $products = $query->latest()->get();
+        return view('admin.product-list', compact('products', 'categories'));
     }
 
-    public function create()
-    {
+    public function create() {
         $categories = Category::all(); 
         return view('admin.product-add', compact('categories'));
     }
 
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
         $request->validate([
-            'name'     => 'required|string|max:255',
-            'price'    => 'required|numeric',
-            'category' => 'required',
-            'stock'    => 'required|integer',
-            'image'    => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'name' => 'required', 'price' => 'required|numeric',
+            'category' => 'required', 'stock' => 'required|integer',
+            'image' => 'nullable|image|max:2048',
         ]);
 
         $imageName = null;
@@ -66,37 +78,23 @@ class AdminController extends Controller
         }
 
         Product::create([
-            'name'        => $request->name,
-            'price'       => $request->price,
-            'category'    => $request->category,
-            'stock'       => $request->stock,
-            'description' => $request->description,
-            'image'       => $imageName,
+            'name' => $request->name, 'price' => $request->price,
+            'category' => $request->category, 'stock' => $request->stock,
+            'description' => $request->description, 'image' => $imageName,
         ]);
 
-        return redirect()->route('admin.product.list')->with('success', 'Produk Berhasil Ditambahkan! 🐾');
+        return redirect()->route('admin.product.list')->with('success', 'Produk Berhasil Ditambahkan!');
     }
 
-    // --- FITUR BARU: EDIT & UPDATE ---
-    public function edit($id)
-    {
+    public function edit($id) {
         $product = Product::findOrFail($id);
         $categories = Category::all();
         return view('admin.product-edit', compact('product', 'categories'));
     }
 
-    public function update(Request $request, $id)
-    {
+    public function update(Request $request, $id) {
         $product = Product::findOrFail($id);
-        $request->validate([
-            'name' => 'required',
-            'price' => 'required|numeric',
-            'category' => 'required',
-            'stock' => 'required|integer',
-        ]);
-
         if ($request->hasFile('image')) {
-            // Hapus gambar lama jika ada
             if ($product->image && File::exists(public_path('assets/img/products/' . $product->image))) {
                 File::delete(public_path('assets/img/products/' . $product->image));
             }
@@ -106,61 +104,69 @@ class AdminController extends Controller
         }
 
         $product->update([
-            'name' => $request->name,
-            'price' => $request->price,
-            'category' => $request->category,
-            'stock' => $request->stock,
-            'description' => $request->description,
-            'image' => $product->image
+            'name' => $request->name, 'price' => $request->price,
+            'category' => $request->category, 'stock' => $request->stock,
+            'description' => $request->description, 'image' => $product->image
         ]);
 
         return redirect()->route('admin.product.list')->with('success', 'Produk Berhasil Diupdate!');
     }
 
-    // --- FITUR BARU: DELETE ---
-    public function destroy($id)
-    {
+    public function destroy($id) {
         $product = Product::findOrFail($id);
         if ($product->image && File::exists(public_path('assets/img/products/' . $product->image))) {
             File::delete(public_path('assets/img/products/' . $product->image));
         }
         $product->delete();
-        return redirect()->route('admin.product.list')->with('success', 'Produk Berhasil Dihapus!');
+        return redirect()->route('admin.product.list')->with('success', 'Produk Dihapus!');
     }
 
-    // --- 3. KATEGORI (CATEGORY) ---
-    public function categoryList() 
-    {
+    // --- 3. KATEGORI ---
+    public function categoryList() {
         $categories = Category::all();
         return view('admin.category-list', compact('categories'));
     }
 
-    public function categoryStore(Request $request) 
-    {
-        $request->validate(['name' => 'required|unique:categories,name|max:100']);
-        Category::create([
-            'name' => $request->name,
-            'slug' => Str::slug($request->name)
-        ]);
-        return redirect()->back()->with('success', 'Kategori baru berhasil ditambahkan!');
+    public function categoryStore(Request $request) {
+        $request->validate(['name' => 'required|unique:categories,name']);
+        Category::create(['name' => $request->name, 'slug' => Str::slug($request->name)]);
+        return redirect()->back()->with('success', 'Kategori baru ditambahkan!');
     }
 
-    public function categoryDelete($id) 
-    {
+    public function categoryDelete($id) {
         Category::findOrFail($id)->delete();
-        return redirect()->back()->with('success', 'Kategori telah dihapus!');
+        return redirect()->back()->with('success', 'Kategori dihapus!');
     }
 
-    public function orderList()
-{
-    $orders = Order::latest()->get();
-    return view('admin.order-list', compact('orders'));
-}
+    // --- 4. PESANAN (LOGIC BARU) ---
+    public function orderList() {
+        $orders = Order::latest()->get();
+        return view('admin.order-list', compact('orders'));
+    }
 
-public function orderDelete($id)
-{
-    $order = Order::findOrFail($id);
-    $order->delete();
-    return redirect()->back()->with('success', 'Data pesanan berhasil dihapus.');
-}
+    public function orderUpdateStatus(Request $request, $id)
+    {
+        $order = Order::findOrFail($id);
+        $oldStatus = $order->status;
+        $newStatus = $request->status;
+
+        // Logic Potong Stok Otomatis saat status berubah jadi COMPLETED
+        if ($newStatus == 'completed' && $oldStatus != 'completed') {
+            $items = $order->items; // Karena sudah di-cast array di Model
+            foreach ($items as $item) {
+                $product = Product::where('name', $item['name'])->first();
+                if ($product) {
+                    $product->decrement('stock', $item['quantity']);
+                }
+            }
+        }
+
+        $order->update(['status' => $newStatus]);
+        return redirect()->back()->with('success', 'Status Berhasil diperbarui!');
+    }
+
+    public function orderDelete($id) {
+        Order::findOrFail($id)->delete();
+        return redirect()->back()->with('success', 'Pesanan dihapus.');
+    }
 }

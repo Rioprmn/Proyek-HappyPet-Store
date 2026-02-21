@@ -40,9 +40,15 @@ Route::prefix('cart')->group(function () {
     Route::get('/clear', [CartController::class, 'clear'])->name('cart.clear');
 });
 
-// --- SISTEM CHECKOUT ---
+// --- SISTEM CHECKOUT & PAYMENT (USER) ---
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
+Route::get('/order/pay/{id}', [CheckoutController::class, 'pay'])->name('order.pay');
+Route::post('/order/upload/{id}', [CheckoutController::class, 'uploadReceipt'])->name('order.upload_receipt');
+
+// Route Riwayat Pesanan (User)
+Route::get('/my-orders', [CheckoutController::class, 'history'])->name('order.history');
+
 
 // --- AREA ADMIN (BACKEND) ---
 Route::prefix('admin')->group(function () {
@@ -64,10 +70,16 @@ Route::prefix('admin')->group(function () {
     Route::prefix('categories')->group(function () {
         Route::get('/', [AdminController::class, 'categoryList'])->name('admin.category.list');
         Route::post('/store', [AdminController::class, 'categoryStore'])->name('admin.category.store');
+        Route::get('/edit/{id}', [AdminController::class, 'categoryEdit'])->name('admin.category.edit');
+        Route::put('/update/{id}', [AdminController::class, 'categoryUpdate'])->name('admin.category.update');
         Route::delete('/delete/{id}', [AdminController::class, 'categoryDelete'])->name('admin.category.delete');
     });
 
     // Manajemen Pesanan (Orders)
     Route::get('/orders', [AdminController::class, 'orderList'])->name('admin.order.list');
     Route::delete('/orders/{id}', [AdminController::class, 'orderDelete'])->name('admin.order.delete');
+    Route::put('/orders/update-status/{id}', [AdminController::class, 'orderUpdateStatus'])->name('admin.order.updateStatus');
+    
+    // Route Konfirmasi Pembayaran Manual
+    Route::post('/orders/confirm/{id}', [AdminController::class, 'confirmPayment'])->name('admin.order.confirm');
 });

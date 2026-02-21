@@ -1,60 +1,120 @@
-/* Styling untuk Tabel di Admin */
+/* Container Utama */
 .table-container {
     background: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    padding: 10px; /* Padding dikurangi untuk kesan clean */
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
 }
 
 .admin-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
 }
 
+/* Header Tabel */
 .admin-table th {
-    background-color: #f8fafc;
-    color: #64748b;
+    background-color: #fcfdfe;
+    color: #94a3b8;
     text-align: left;
-    padding: 12px 15px;
-    border-bottom: 2px solid #e2e8f0;
-    font-size: 0.85rem;
+    padding: 18px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.75rem;
     text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+}
+
+/* Baris Tabel */
+.admin-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.admin-table tbody tr:hover {
+    background-color: #f8fafc; /* Efek hover saat baris disorot */
 }
 
 .admin-table td {
-    padding: 15px;
+    padding: 16px 20px;
     border-bottom: 1px solid #f1f5f9;
     vertical-align: middle;
     color: #334155;
+    font-size: 0.9rem;
+}
+
+/* Styling Gambar Produk */
+.prod-img-wrapper {
+    width: 55px;
+    height: 55px;
+    background: #f1f5f9;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+}
+
+.prod-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 /* Badge Kategori */
 .category-badge {
-    background: #f0f9f8;
+    background: #f0fdfa;
     color: #2c9a94;
-    padding: 4px 10px;
-    border-radius: 20px;
+    padding: 6px 12px;
+    border-radius: 8px;
     font-size: 0.75rem;
     font-weight: 600;
+    border: 1px solid #ccfbf1;
 }
 
-/* Tombol Aksi */
-.btn-edit {
-    color: #3b82f6;
-    text-decoration: none;
-    margin-right: 10px;
-    font-size: 1.1rem;
+/* Badge Stok */
+.stock-badge {
+    font-weight: 500;
+    color: #64748b;
 }
-
-.btn-delete {
-    background: none;
-    border: none;
+.stock-low {
     color: #ef4444;
-    cursor: pointer;
-    font-size: 1.1rem;
+    font-weight: 700;
 }
 
-.btn-delete:hover, .btn-edit:hover {
-    opacity: 0.7;
+/* Tombol Aksi Custom */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-action {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-edit-new {
+    background: #eff6ff;
+    color: #3b82f6;
+}
+.btn-edit-new:hover {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-delete-new {
+    background: #fef2f2;
+    color: #ef4444;
+}
+.btn-delete-new:hover {
+    background: #ef4444;
+    color: white;
 }

@@ -22,13 +22,20 @@
             <a href="/shop?category={{ strtolower($category->name) }}" class="category-card">
                 {{-- Logika simpel untuk nampilin icon berdasarkan nama kategori --}}
                 <span>
-                    @if(Str::contains(strtolower($category->name), 'dog')) 🐶 
-                    @elseif(Str::contains(strtolower($category->name), 'cat')) 🐱 
-                    @elseif(Str::contains(strtolower($category->name), 'food')) 🦴 
-                    @elseif(Str::contains(strtolower($category->name), 'acc')) 🧸 
-                    @elseif(Str::contains(strtolower($category->name), 'vit')) 💊 
-                    @else 🐾 @endif
-                </span>
+                @php 
+                    $name = strtolower($category->name); 
+                @endphp
+
+                @if(Str::contains($name, ['anjing', 'dog'])) 🐶 
+                @elseif(Str::contains($name, ['kucing', 'cat'])) 🐱 
+                @elseif(Str::contains($name, ['burung', 'bird'])) 🦜 
+                @elseif(Str::contains($name, ['ayam', 'chicken'])) 🐔 
+                @elseif(Str::contains($name, ['ikan', 'fish'])) 🐟 
+                @elseif(Str::contains($name, ['makanan', 'food'])) 🦴 
+                @elseif(Str::contains($name, ['aksesoris', 'mainan', 'acc'])) 🧸 
+                @elseif(Str::contains($name, ['vitamin', 'obat', 'vit'])) 💊 
+                @else 🐾 @endif
+            </span>
                 <h3>{{ $category->name }}</h3>
             </a>
             @endforeach
@@ -57,6 +64,13 @@
             @endforelse
         </div>
     </div>
+    <br>
+    <div style="text-align: center; margin-top: 40px;">
+    <a href="/shop" class="btn-main" style="background: transparent; color: #38b2ac; border: 2px solid #38b2ac;">
+        View All Products →
+    </a>
+</div>
+
 </section>
 
 @endsection
