@@ -27,7 +27,7 @@
                     @endforeach
                 </ul>
             </li>
-            
+
             {{-- Blog --}}
             <li>
                 <a href="/blog" class="{{ request()->is('blog*') ? 'active' : '' }}">Blog</a>
@@ -52,6 +52,14 @@
                             {{ count(session('cart')) }}
                         </span>
                     @endif
+                </a>
+            </li>
+            <li class="{{ request()->routeIs('order.history') ? 'active' : '' }}">
+                <a href="{{ route('order.history') }}" 
+                style="text-decoration: none; 
+                        color: {{ request()->routeIs('order.history') ? '#2c9a94' : '#333' }}; 
+                        font-weight: {{ request()->routeIs('order.history') ? 'bold' : 'normal' }};">
+                    Riwayat Pesanan
                 </a>
             </li>
         </ul>

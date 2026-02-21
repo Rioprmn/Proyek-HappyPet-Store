@@ -17,6 +17,7 @@ class AdminController extends Controller
         $totalProducts = Product::count();
         $totalStock = Product::sum('stock');
         $totalOrders = Order::count();
+        $lowStockProducts = Product::where('stock', '<=', 5)->get();
         $totalRevenue = Order::where('status', 'completed')->sum('total_price');
         
         $categories = Category::all();
@@ -44,7 +45,7 @@ class AdminController extends Controller
             'salesData' => $salesData
         ];
         
-        return view('admin.dashboard', compact('totalProducts', 'totalStock', 'totalOrders', 'totalRevenue', 'chartData'));
+        return view('admin.dashboard', compact('totalProducts', 'totalStock', 'totalOrders', 'totalRevenue', 'chartData','lowStockProducts'));
     }
 
     // --- 2. PRODUK ---
@@ -145,28 +146,46 @@ class AdminController extends Controller
     }
 
     public function orderUpdateStatus(Request $request, $id)
-    {
-        $order = Order::findOrFail($id);
-        $oldStatus = $order->status;
-        $newStatus = $request->status;
+{
+    $order = Order::findOrFail($id);
+    $oldStatus = $order->status;
+    $newStatus = $request->status;
 
-        // Logic Potong Stok Otomatis saat status berubah jadi COMPLETED
-        if ($newStatus == 'completed' && $oldStatus != 'completed') {
-            $items = $order->items; // Karena sudah di-cast array di Model
-            foreach ($items as $item) {
-                $product = Product::where('name', $item['name'])->first();
-                if ($product) {
-                    $product->decrement('stock', $item['quantity']);
-                }
+    // LOGIKA POTONG STOK: Hanya jika status berubah dari 'anything' ke 'completed'
+    if ($oldStatus !== 'completed' && $newStatus === 'completed') {
+        foreach ($order->items as $item) {
+            $product = Product::where('name', $item['name'])->first();
+            if ($product) {
+                // Kurangi stok sesuai jumlah yang dibeli
+                $product->decrement('stock', $item['quantity']);
             }
         }
-
-        $order->update(['status' => $newStatus]);
-        return redirect()->back()->with('success', 'Status Berhasil diperbarui!');
     }
+    
+    // LOGIKA KEMBALIKAN STOK: Jika pesanan dibatalkan (opsional)
+    if ($oldStatus === 'completed' && $newStatus === 'cancelled') {
+        foreach ($order->items as $item) {
+            $product = Product::where('name', $item['name'])->first();
+            if ($product) {
+                $product->increment('stock', $item['quantity']);
+            }
+        }
+    }
+
+    $order->update(['status' => $newStatus]);
+
+    return redirect()->back()->with('success', 'Status pesanan diperbarui dan stok telah disesuaikan!');
+}
 
     public function orderDelete($id) {
         Order::findOrFail($id)->delete();
         return redirect()->back()->with('success', 'Pesanan dihapus.');
     }
+
+    public function printReceipt($id)
+{
+    $order = Order::findOrFail($id);
+    return view('admin.print-receipt', compact('order'));
+}
+
 }

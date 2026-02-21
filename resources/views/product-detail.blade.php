@@ -36,6 +36,7 @@
                 <div style="display: flex; gap: 12px;">
                     {{-- Input Quantity --}}
                     <input type="number" name="quantity" value="1" min="1" 
+                            max="{{ $product->stock }}"  
                            style="width: 70px; padding: 12px; border-radius: 8px; border: 1px solid #ddd; text-align: center; outline: none; transition: 0.3s;"
                            onfocus="this.style.borderColor='#2c9a94'">
                     

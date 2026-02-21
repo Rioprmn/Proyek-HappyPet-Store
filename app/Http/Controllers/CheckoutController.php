@@ -107,4 +107,20 @@ class CheckoutController extends Controller
 
         return redirect()->back()->with('error', 'Gagal mengunggah bukti pembayaran.');
     }
+
+    public function history(Request $request)
+{
+    $phone = $request->get('phone');
+    $orders = [];
+
+    if ($phone) {
+        // Cari pesanan berdasarkan nomor whatsapp, urutkan dari yang terbaru
+        $orders = Order::where('whatsapp', $phone)
+                       ->orderBy('created_at', 'desc')
+                       ->get();
+    }
+
+    return view('order-history', compact('orders', 'phone'));
+}
+
 }

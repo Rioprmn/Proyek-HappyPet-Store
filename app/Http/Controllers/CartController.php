@@ -15,24 +15,29 @@ class CartController extends Controller
     }
 
     // Menambah produk ke keranjang
-    public function add(Request $request)
+   public function add(Request $request)
 {
     $product = Product::findOrFail($request->product_id);
+    $quantityRequested = $request->input('quantity', 1);
+
+    // CEK: Apakah stok mencukupi?
+    if ($product->stock < $quantityRequested) {
+        return redirect()->back()->with('error', 'Maaf, stok tidak mencukupi. Sisa stok: ' . $product->stock);
+    }
+
     $cart = session()->get('cart', []);
 
-    // AMBIL QUANTITY DARI INPUT FORM (detail produk)
-    // Jika input tidak ada, default ke 1
-    $quantity = $request->input('quantity', 1);
-
-    // Jika produk sudah ada di keranjang, tambahkan jumlahnya sesuai input
     if(isset($cart[$product->id])) {
-        // Pakai += agar jumlah yang baru ditambahkan ke jumlah yang lama
-        $cart[$product->id]['quantity'] += $quantity;
+        // CEK LAGI: Total di keranjang + permintaan baru tidak boleh > stok
+        $newQty = $cart[$product->id]['quantity'] + $quantityRequested;
+        if ($newQty > $product->stock) {
+            return redirect()->back()->with('error', 'Total di keranjang melebihi stok yang tersedia.');
+        }
+        $cart[$product->id]['quantity'] = $newQty;
     } else {
-        // Jika belum ada, masukkan data baru dengan quantity sesuai input
         $cart[$product->id] = [
             "name" => $product->name,
-            "quantity" => $quantity, // Pakai variabel $quantity
+            "quantity" => $quantityRequested,
             "price" => $product->price,
             "image" => $product->image
         ];

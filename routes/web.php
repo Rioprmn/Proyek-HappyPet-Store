@@ -77,6 +77,7 @@ Route::prefix('admin')->group(function () {
 
     // Manajemen Pesanan (Orders)
     Route::get('/orders', [AdminController::class, 'orderList'])->name('admin.order.list');
+    Route::get('/orders/print/{id}', [AdminController::class, 'printReceipt'])->name('admin.order.print');
     Route::delete('/orders/{id}', [AdminController::class, 'orderDelete'])->name('admin.order.delete');
     Route::put('/orders/update-status/{id}', [AdminController::class, 'orderUpdateStatus'])->name('admin.order.updateStatus');
     
