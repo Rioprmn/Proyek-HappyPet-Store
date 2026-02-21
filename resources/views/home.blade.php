@@ -1,6 +1,5 @@
 @extends('layouts.app')
 
-{{-- Tambahkan ini agar CSS home terpanggil --}}
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
 @endpush
@@ -19,22 +18,20 @@
     <div class="container">
         <h2>Shop by Category</h2>
         <div class="category-list">
-            <a href="/shop?category=dog" class="category-card">
-                <span>🐶</span>
-                <h3>Dog</h3>
+            @foreach($categories as $category)
+            <a href="/shop?category={{ strtolower($category->name) }}" class="category-card">
+                {{-- Logika simpel untuk nampilin icon berdasarkan nama kategori --}}
+                <span>
+                    @if(Str::contains(strtolower($category->name), 'dog')) 🐶 
+                    @elseif(Str::contains(strtolower($category->name), 'cat')) 🐱 
+                    @elseif(Str::contains(strtolower($category->name), 'food')) 🦴 
+                    @elseif(Str::contains(strtolower($category->name), 'acc')) 🧸 
+                    @elseif(Str::contains(strtolower($category->name), 'vit')) 💊 
+                    @else 🐾 @endif
+                </span>
+                <h3>{{ $category->name }}</h3>
             </a>
-            <a href="/shop?category=cat" class="category-card">
-                <span>🐱</span>
-                <h3>Cat</h3>
-            </a>
-            <a href="/shop?category=accessories" class="category-card">
-                <span>🧸</span>
-                <h3>Accessories</h3>
-            </a>
-            <a href="/shop?category=vitamins" class="category-card">
-                <span>💊</span>
-                <h3>Vitamins</h3>
-            </a>
+            @endforeach
         </div>
     </div>
 </section>
@@ -43,16 +40,21 @@
     <div class="container">
         <h2 style="text-align:center; margin-bottom:40px;">Featured Products</h2>
         <div class="product-list">
-            @foreach($featuredProducts as $product)
+            @forelse($featuredProducts as $product)
             <div class="product-card">
                 <a href="{{ route('product.detail', $product->id) }}">
                     <img src="{{ asset('assets/img/products/' . ($product->image ?? 'default.png')) }}" alt="{{ $product->name }}">
                 </a>
-                <h3>{{ $product->name }}</h3>
-                <p class="price">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
-                <a href="{{ route('product.detail', $product->id) }}" class="btn-view-detail">Lihat Detail</a>
+                <div class="product-info" style="padding: 15px;">
+                    <h3>{{ $product->name }}</h3>
+                    <p class="category-text" style="font-size: 0.8rem; color: #64748b;">{{ $product->category }}</p>
+                    <p class="price">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+                    <a href="{{ route('product.detail', $product->id) }}" class="btn-view-detail">Lihat Detail</a>
+                </div>
             </div>
-            @endforeach
+            @empty
+            <p style="text-align: center; width: 100%; color: #94a3b8;">Belum ada produk unggulan.</p>
+            @endforelse
         </div>
     </div>
 </section>

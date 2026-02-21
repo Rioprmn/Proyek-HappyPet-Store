@@ -14,13 +14,20 @@
             <li class="dropdown">
                 <a href="/shop" class="{{ request()->is('shop*') ? 'active' : '' }}">Shop</a>
                 <ul class="dropdown-menu">
-                    <li><a href="/shop?category=dog">Dog</a></li>
-                    <li><a href="/shop?category=cat">Cat</a></li>
-                    <li><a href="/shop?category=accessories">Accessories</a></li>
-                    <li><a href="/shop?category=vitamins">Vitamins</a></li>
+                    {{-- Link untuk lihat semua produk --}}
+                    <li><a href="/shop" style="font-weight: bold; border-bottom: 1px solid #eee;">All Products</a></li>
+                    
+                    {{-- Looping kategori dari database --}}
+                    @foreach($globalCategories as $cat)
+                        <li>
+                            <a href="/shop?category={{ strtolower($cat->name) }}">
+                                {{ $cat->name }}
+                            </a>
+                        </li>
+                    @endforeach
                 </ul>
             </li>
-
+            
             {{-- Blog --}}
             <li>
                 <a href="/blog" class="{{ request()->is('blog*') ? 'active' : '' }}">Blog</a>

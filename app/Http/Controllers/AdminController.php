@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File; // Tambahkan ini untuk hapus file gambar
@@ -12,11 +13,27 @@ class AdminController extends Controller
 {
     // --- 1. DASHBOARD ---
     public function dashboard()
-    {
-        $totalProducts = Product::count();
-        $totalStock = Product::sum('stock');
-        return view('admin.dashboard', compact('totalProducts', 'totalStock'));
+{
+    $totalProducts = Product::count();
+    $totalStock = Product::sum('stock');
+    
+    // Data untuk Chart: Menghitung jumlah produk tiap kategori
+    $categories = Category::all();
+    $chartLabels = [];
+    $chartCounts = [];
+    
+    foreach($categories as $cat) {
+        $chartLabels[] = $cat->name;
+        $chartCounts[] = Product::where('category', $cat->name)->count();
     }
+
+    $chartData = [
+        'labels' => $chartLabels,
+        'counts' => $chartCounts
+    ];
+    
+    return view('admin.dashboard', compact('totalProducts', 'totalStock', 'chartData'));
+}
 
     // --- 2. PRODUK (PRODUCT) ---
 
@@ -133,4 +150,17 @@ class AdminController extends Controller
         Category::findOrFail($id)->delete();
         return redirect()->back()->with('success', 'Kategori telah dihapus!');
     }
+
+    public function orderList()
+{
+    $orders = Order::latest()->get();
+    return view('admin.order-list', compact('orders'));
+}
+
+public function orderDelete($id)
+{
+    $order = Order::findOrFail($id);
+    $order->delete();
+    return redirect()->back()->with('success', 'Data pesanan berhasil dihapus.');
+}
 }

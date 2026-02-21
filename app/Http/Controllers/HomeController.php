@@ -3,16 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        // Mengambil 4 produk terbaru dari tabel products
-        $featuredProducts = Product::latest()->take(4)->get();
+        // Ambil 4-8 produk terbaru untuk ditampilkan di Featured Products
+        $featuredProducts = Product::latest()->take(8)->get();
+        
+        // Ambil semua kategori untuk bagian "Shop by Category"
+        $categories = Category::all();
 
-        // Mengirim data ke view home.blade.php
-        return view('home', compact('featuredProducts'));
+        return view('home', compact('featuredProducts', 'categories'));
     }
 }
