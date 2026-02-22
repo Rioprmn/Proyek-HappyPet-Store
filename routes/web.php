@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\BlogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,9 +21,10 @@ Route::get('/about', function () {
     return view('about');
 })->name('about');
 
-Route::get('/blog', function () {
-    return view('blog');
-})->name('blog');
+// --- FITUR BLOG (USER SIDE) ---
+// Diubah agar memanggil Controller, bukan sekadar view statis
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.index'); 
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
 Route::get('/contact', function () {
     return view('contact');
@@ -45,8 +47,6 @@ Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.in
 Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
 Route::get('/order/pay/{id}', [CheckoutController::class, 'pay'])->name('order.pay');
 Route::post('/order/upload/{id}', [CheckoutController::class, 'uploadReceipt'])->name('order.upload_receipt');
-
-// Route Riwayat Pesanan (User)
 Route::get('/my-orders', [CheckoutController::class, 'history'])->name('order.history');
 
 
@@ -66,12 +66,10 @@ Route::prefix('admin')->group(function () {
         Route::delete('/delete/{id}', [AdminController::class, 'destroy'])->name('admin.product.delete');
     });
 
-    // Manajemen Kategori
+    // Manajemen Kategori Belanja (Produk)
     Route::prefix('categories')->group(function () {
         Route::get('/', [AdminController::class, 'categoryList'])->name('admin.category.list');
         Route::post('/store', [AdminController::class, 'categoryStore'])->name('admin.category.store');
-        Route::get('/edit/{id}', [AdminController::class, 'categoryEdit'])->name('admin.category.edit');
-        Route::put('/update/{id}', [AdminController::class, 'categoryUpdate'])->name('admin.category.update');
         Route::delete('/delete/{id}', [AdminController::class, 'categoryDelete'])->name('admin.category.delete');
     });
 
@@ -80,7 +78,26 @@ Route::prefix('admin')->group(function () {
     Route::get('/orders/print/{id}', [AdminController::class, 'printReceipt'])->name('admin.order.print');
     Route::delete('/orders/{id}', [AdminController::class, 'orderDelete'])->name('admin.order.delete');
     Route::put('/orders/update-status/{id}', [AdminController::class, 'orderUpdateStatus'])->name('admin.order.updateStatus');
-    
-    // Route Konfirmasi Pembayaran Manual
-    Route::post('/orders/confirm/{id}', [AdminController::class, 'confirmPayment'])->name('admin.order.confirm');
+
+    // Laporan Penjualan
+    Route::get('/reports', [AdminController::class, 'reportIndex'])->name('admin.report.index');
+    Route::get('/reports/download/{period}', [AdminController::class, 'downloadReport'])->name('admin.report.download');
+
+    // --- MANAJEMEN BLOG (INI YANG DI-FIX) ---
+    Route::prefix('blog')->group(function () {
+        // List & Artikel
+        Route::get('/', [AdminController::class, 'blogList'])->name('admin.blog.list');
+        Route::get('/create', [AdminController::class, 'blogCreate'])->name('admin.blog.create');
+        Route::post('/store', [AdminController::class, 'blogStore'])->name('admin.blog.store');
+        Route::get('/edit/{id}', [AdminController::class, 'blogEdit'])->name('admin.blog.edit');
+        Route::put('/update/{id}', [AdminController::class, 'blogUpdate'])->name('admin.blog.update');
+        Route::delete('/delete/{id}', [AdminController::class, 'blogDestroy'])->name('admin.blog.delete');
+
+        // Kategori Blog
+        Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+        Route::get('/categories', [AdminController::class, 'blogCategoryList'])->name('admin.blog.category.list');
+        Route::post('/categories/store', [AdminController::class, 'blogCategoryStore'])->name('admin.blog.category.store');
+        // PASTIKAN NAMA ROUTE INI 'destroy' BUKAN 'delete'
+        Route::delete('/categories/destroy/{id}', [AdminController::class, 'blogCategoryDestroy'])->name('admin.blog.category.destroy');
+    });
 });

@@ -30,7 +30,7 @@
 
             {{-- Blog --}}
             <li>
-                <a href="/blog" class="{{ request()->is('blog*') ? 'active' : '' }}">Blog</a>
+                <a href="{{ route('blog.index') }}" class="{{ request()->routeIs('blog.*') ? 'active' : '' }}">Blog</a>
             </li>
 
             {{-- About --}}
