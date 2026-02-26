@@ -68,13 +68,23 @@
                 </a>
             </li>
 
+            {{-- User Management --}}
+            <li>
+                <a href="{{ route('admin.user.list') }}" class="{{ request()->routeIs('admin.user.*') ? 'active' : '' }}">
+                    👥 <span>Manajemen User</span>
+                </a>
+            </li>
+
             <hr style="border: 0.5px solid #334155; margin: 20px 0;">
             
-            {{-- Kembali ke Toko Depan --}}
+            {{-- Logout --}}
             <li>
-                <a href="{{ route('home') }}" style="color: #ef4444;">
-                    🚪 <span>Back to Store</span>
-                </a>
+                <form method="POST" action="{{ route('logout') }}" style="display: block;">
+                    @csrf
+                    <button type="submit" style="background: none; border: none; color: #ef4444; cursor: pointer; font-weight: bold; font-size: 14px; width: 100%; text-align: left; padding: 12px 15px; display: flex; align-items: center; gap: 10px;">
+                        🚪 <span>Logout</span>
+                    </button>
+                </form>
             </li>
         </ul>
     </div>

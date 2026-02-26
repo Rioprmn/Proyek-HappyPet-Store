@@ -1,13 +1,16 @@
 /* =========================
-   NAVBAR STYLES
+   NAVBAR STYLES - PREMIUM
    ========================= */
 
 .navbar {
-    background-color: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-bottom: 1px solid #e2e8f0;
     position: sticky;
     top: 0;
     z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.95);
 }
 
 .navbar .container {
@@ -15,23 +18,34 @@
     justify-content: space-between;
     align-items: center;
     height: 70px;
+    padding: 0 40px;
 }
 
 /* Logo */
 .logo a {
-    font-size: 22px;
-    font-weight: 700;
-    color: #38b2ac;
+    font-size: 24px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #2c9a94 0%, #1a7a75 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     text-decoration: none;
+    letter-spacing: -0.5px;
+    transition: all 0.3s ease;
+}
+
+.logo a:hover {
+    transform: scale(1.05);
 }
 
 /* Menu */
 .nav-menu {
     display: flex;
-    gap: 24px;
-    list-style: none; /* Pastikan bullet hilang */
+    gap: 8px;
+    list-style: none;
     margin: 0;
     padding: 0;
+    align-items: center;
 }
 
 .nav-menu li {
@@ -41,60 +55,65 @@
 }
 
 .nav-menu a {
-    color: #374151;
-    font-size: 15px;
-    font-weight: 500;
-    padding: 10px 0;
-    transition: all 0.3s ease;
+    color: #475569;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 16px;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     display: inline-block;
     text-decoration: none;
+    border-radius: 6px;
+    position: relative;
 }
 
-/* --- State Active & Hover --- */
-.nav-menu a:hover, 
+.nav-menu a:hover {
+    color: #2c9a94;
+    background: rgba(44, 154, 148, 0.08);
+}
+
 .nav-menu a.active {
-    color: #38b2ac;
+    color: #2c9a94;
+    background: rgba(44, 154, 148, 0.12);
 }
 
-/* Garis bawah untuk menu utama (bukan dropdown) */
+/* Garis bawah untuk menu utama */
 .nav-menu > li > a::after {
     content: "";
     position: absolute;
-    bottom: 5px;
-    left: 0;
+    bottom: 4px;
+    left: 16px;
     width: 0;
     height: 2px;
-    background-color: #38b2ac;
-    transition: width 0.3s ease;
+    background: linear-gradient(90deg, #2c9a94, #1a7a75);
+    transition: width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .nav-menu > li > a:hover::after,
 .nav-menu > li > a.active::after {
-    width: 100%;
+    width: calc(100% - 32px);
 }
 
-/* --- Dropdown Logic --- */
+/* Dropdown Logic */
 .dropdown-menu {
     position: absolute;
-    top: 100%; 
+    top: 100%;
     left: 0;
-    background-color: #ffffff;
-    border: 1px solid #e5e7eb;
-    min-width: 190px;
-    padding: 8px 0;
+    background: white;
+    border: 1px solid #e2e8f0;
+    min-width: 200px;
+    padding: 12px 0;
     display: none;
-    border-radius: 8px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
     list-style: none;
     margin: 0;
-    /* Menghilangkan animasi kedip saat pindah kursor */
-    pointer-events: none; 
+    pointer-events: none;
     opacity: 0;
     transform: translateY(10px);
-    transition: all 0.2s ease-out;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    margin-top: 8px;
 }
 
-/* Area transisi agar dropdown tidak mudah hilang saat kursor bergerak ke bawah */
 .dropdown::after {
     content: "";
     position: absolute;
@@ -122,30 +141,102 @@
 
 .dropdown-menu li a {
     display: block;
-    padding: 10px 20px;
-    color: #374151;
+    padding: 12px 20px;
+    color: #475569;
     font-size: 14px;
+    font-weight: 500;
     width: 100%;
-    transition: background 0.2s;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
 }
 
-/* Matikan garis bawah di dalam dropdown */
 .dropdown-menu li a::after {
     display: none;
 }
 
 .dropdown-menu li a:hover {
-    background-color: #f0fdf4;
-    color: #38b2ac;
+    background: linear-gradient(90deg, rgba(44, 154, 148, 0.08) 0%, transparent 100%);
+    color: #2c9a94;
+    border-left-color: #2c9a94;
+    padding-left: 24px;
 }
 
-/* Badge Cart Styling */
+/* Profile Dropdown Special Styling */
+.nav-menu li.dropdown[style*="margin-left: auto"] .dropdown-menu {
+    right: 0;
+    left: auto;
+}
+
+.nav-menu li.dropdown[style*="margin-left: auto"] a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 50px;
+    background: rgba(44, 154, 148, 0.08);
+}
+
+.nav-menu li.dropdown[style*="margin-left: auto"] a:hover {
+    background: rgba(44, 154, 148, 0.15);
+    transform: translateY(-2px);
+}
+
+.nav-menu li.dropdown[style*="margin-left: auto"] a img {
+    transition: all 0.3s ease;
+}
+
+.nav-menu li.dropdown[style*="margin-left: auto"] a:hover img {
+    transform: scale(1.1);
+}
+
+/* Cart Badge */
 .cart-badge {
-    background: #e67e22;
+    background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
     color: white;
-    padding: 2px 6px;
+    padding: 2px 7px;
     border-radius: 50%;
-    font-size: 10px;
-    font-weight: bold;
+    font-size: 11px;
+    font-weight: 700;
     margin-left: 4px;
+    box-shadow: 0 2px 8px rgba(230, 126, 34, 0.3);
+    animation: pulse-badge 2s ease-in-out infinite;
+}
+
+@keyframes pulse-badge {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .navbar .container {
+        padding: 0 20px;
+        height: 60px;
+    }
+
+    .logo a {
+        font-size: 20px;
+    }
+
+    .nav-menu {
+        gap: 4px;
+    }
+
+    .nav-menu a {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+
+    .dropdown-menu {
+        min-width: 180px;
+        padding: 10px 0;
+    }
+
+    .dropdown-menu li a {
+        padding: 10px 16px;
+    }
 }
