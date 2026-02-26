@@ -1,37 +1,82 @@
 @extends('layouts.admin')
 
-@section('content')
-<h1 style="color: #1e293b; font-weight: 700;">Pusat Laporan HappyPet</h1>
-<p style="color: #64748b; margin-bottom: 30px;">Analisis performa toko Anda secara visual.</p>
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin-report.css') }}">
+@endpush
 
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px;">
+@section('content')
+<div class="report-header">
+    <div class="header-content">
+        <div>
+            <h1 class="report-title">📊 Pusat Laporan HappyPet</h1>
+            <p class="report-subtitle">Analisis performa toko Anda secara visual</p>
+        </div>
+    </div>
+</div>
+
+<div class="report-grid">
     
     {{-- Card Harian --}}
-    <div style="background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <span style="font-size: 1.5rem;">📅</span>
-            <span style="background: #f1f5f9; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; color: #64748b;">HARIAN</span>
+    <div class="report-card daily-card" style="animation-delay: 0.1s">
+        <div class="card-header">
+            <span class="card-icon">📅</span>
+            <span class="card-badge">HARIAN</span>
         </div>
-        <h3 style="margin: 0; color: #1e293b;">Rp {{ number_format($dailyRevenue, 0, ',', '.') }}</h3>
-        <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 20px;">Pendapatan hari ini</p>
-        <div style="height: 100px; margin-bottom: 20px;">
+        
+        <div class="card-content">
+            <h3 class="revenue-value">Rp {{ number_format($dailyRevenue, 0, ',', '.') }}</h3>
+            <p class="revenue-label">Pendapatan hari ini</p>
+        </div>
+
+        <div class="chart-mini">
             <canvas id="miniDailyChart"></canvas>
         </div>
-        <a href="{{ route('admin.report.download', 'daily') }}" style="display: block; text-align: center; padding: 12px; background: #ef4444; color: white; text-decoration: none; border-radius: 12px; font-weight: 600;">Download PDF</a>
+
+        <a href="{{ route('admin.report.download', 'daily') }}" class="btn-download">
+            📥 Download PDF
+        </a>
     </div>
 
     {{-- Card Bulanan --}}
-    <div style="background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <span style="font-size: 1.5rem;">📊</span>
-            <span style="background: #f1f5f9; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; color: #64748b;">BULANAN</span>
+    <div class="report-card monthly-card" style="animation-delay: 0.2s">
+        <div class="card-header">
+            <span class="card-icon">📊</span>
+            <span class="card-badge">BULANAN</span>
         </div>
-        <h3 style="margin: 0; color: #1e293b;">Rp {{ number_format($monthlyRevenue, 0, ',', '.') }}</h3>
-        <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 20px;">Pendapatan bulan ini</p>
-        <div style="height: 100px; margin-bottom: 20px;">
+        
+        <div class="card-content">
+            <h3 class="revenue-value">Rp {{ number_format($monthlyRevenue, 0, ',', '.') }}</h3>
+            <p class="revenue-label">Pendapatan bulan ini</p>
+        </div>
+
+        <div class="chart-mini">
             <canvas id="miniMonthlyChart"></canvas>
         </div>
-        <a href="{{ route('admin.report.download', 'monthly') }}" style="display: block; text-align: center; padding: 12px; background: #ef4444; color: white; text-decoration: none; border-radius: 12px; font-weight: 600;">Download PDF</a>
+
+        <a href="{{ route('admin.report.download', 'monthly') }}" class="btn-download">
+            📥 Download PDF
+        </a>
+    </div>
+
+    {{-- Card Tahunan --}}
+    <div class="report-card yearly-card" style="animation-delay: 0.3s">
+        <div class="card-header">
+            <span class="card-icon">📈</span>
+            <span class="card-badge">TAHUNAN</span>
+        </div>
+        
+        <div class="card-content">
+            <h3 class="revenue-value">Rp {{ number_format($monthlyRevenue * 12, 0, ',', '.') }}</h3>
+            <p class="revenue-label">Proyeksi pendapatan tahun ini</p>
+        </div>
+
+        <div class="chart-mini">
+            <canvas id="miniYearlyChart"></canvas>
+        </div>
+
+        <a href="{{ route('admin.report.download', 'monthly') }}" class="btn-download">
+            📥 Download PDF
+        </a>
     </div>
 
 </div>
@@ -39,6 +84,9 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+    Chart.defaults.color = '#64748b';
+
     const chartOptions = {
         responsive: true,
         maintainAspectRatio: false,
@@ -54,11 +102,16 @@
             labels: {!! json_encode($dailyLabels) !!},
             datasets: [{
                 data: {!! json_encode($dailyData) !!},
-                borderColor: '#2c9a94',
+                borderColor: '#ef4444',
                 borderWidth: 3,
                 tension: 0.4,
                 fill: true,
-                backgroundColor: 'rgba(44, 154, 148, 0.1)'
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                pointBackgroundColor: '#ef4444',
+                pointBorderColor: 'white',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
             }]
         },
         options: chartOptions
@@ -72,7 +125,23 @@
             datasets: [{
                 data: {!! json_encode($monthlyData) !!},
                 backgroundColor: '#3b82f6',
-                borderRadius: 4
+                borderRadius: 6,
+                borderSkipped: false
+            }]
+        },
+        options: chartOptions
+    });
+
+    // Grafik Mini Tahunan
+    new Chart(document.getElementById('miniYearlyChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Pendapatan', 'Target'],
+            datasets: [{
+                data: [{!! json_encode($monthlyRevenue * 12) !!}, 100000000],
+                backgroundColor: ['#8b5cf6', '#e5e7eb'],
+                borderColor: 'white',
+                borderWidth: 2
             }]
         },
         options: chartOptions

@@ -1,0 +1,290 @@
+/* Admin Report Styling */
+
+.report-header {
+    margin-bottom: 40px;
+    animation: slideInDown 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.report-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 8px;
+    letter-spacing: -0.025em;
+}
+
+.report-subtitle {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* Report Grid */
+.report-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 25px;
+}
+
+/* Report Card */
+.report-card {
+    background: white;
+    padding: 28px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    border: 2px solid #e2e8f0;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: fadeInUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    opacity: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.report-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #2c9a94, #1a7a75);
+}
+
+.daily-card::before {
+    background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+.monthly-card::before {
+    background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+}
+
+.yearly-card::before {
+    background: linear-gradient(90deg, #8b5cf6, #6d28d9);
+}
+
+.report-card:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border-color: #cbd5e1;
+}
+
+/* Card Header */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.card-icon {
+    font-size: 1.8rem;
+}
+
+.card-badge {
+    background: #f1f5f9;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Card Content */
+.card-content {
+    margin-bottom: 20px;
+}
+
+.revenue-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0 0 8px;
+}
+
+.revenue-label {
+    color: #94a3b8;
+    font-size: 0.9rem;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Chart Mini */
+.chart-mini {
+    height: 100px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+/* Download Button */
+.btn-download {
+    display: block;
+    text-align: center;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+.monthly-card .btn-download {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.yearly-card .btn-download {
+    background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+}
+
+.btn-download:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+}
+
+.monthly-card .btn-download:hover {
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+}
+
+.yearly-card .btn-download:hover {
+    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+}
+
+/* Animations */
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .report-title {
+        font-size: 1.6rem;
+    }
+
+    .report-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .report-title {
+        font-size: 1.4rem;
+    }
+
+    .report-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .report-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .report-card {
+        padding: 20px;
+    }
+
+    .card-icon {
+        font-size: 1.5rem;
+    }
+
+    .card-badge {
+        font-size: 0.7rem;
+        padding: 4px 10px;
+    }
+
+    .revenue-value {
+        font-size: 1.5rem;
+    }
+
+    .revenue-label {
+        font-size: 0.85rem;
+    }
+
+    .chart-mini {
+        height: 80px;
+    }
+
+    .btn-download {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .report-title {
+        font-size: 1.2rem;
+    }
+
+    .report-subtitle {
+        font-size: 0.85rem;
+    }
+
+    .report-card {
+        padding: 16px;
+    }
+
+    .card-header {
+        margin-bottom: 16px;
+    }
+
+    .card-icon {
+        font-size: 1.3rem;
+    }
+
+    .card-badge {
+        font-size: 0.65rem;
+        padding: 3px 8px;
+    }
+
+    .card-content {
+        margin-bottom: 16px;
+    }
+
+    .revenue-value {
+        font-size: 1.3rem;
+    }
+
+    .revenue-label {
+        font-size: 0.8rem;
+    }
+
+    .chart-mini {
+        height: 70px;
+        margin-bottom: 16px;
+    }
+
+    .btn-download {
+        padding: 10px 14px;
+        font-size: 0.85rem;
+    }
+}
