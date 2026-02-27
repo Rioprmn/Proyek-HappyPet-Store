@@ -81,10 +81,10 @@
         <div class="form-section">
             <h2>📸 Upload Bukti Pembayaran</h2>
             
-            <div class="form-group">
+            <div id="upload-section" class="form-group">
                 <label>Pilih Gambar Bukti Transfer</label>
                 <div class="file-upload-area">
-                    <input type="file" name="receipt" id="receipt" accept="image/*" required>
+                    <input type="file" name="receipt" id="receipt" accept="image/*">
                     <label for="receipt" class="file-label">
                         <i class="fas fa-cloud-upload-alt"></i>
                         <span>Klik atau drag gambar di sini</span>
@@ -94,6 +94,21 @@
                 @error('receipt')
                     <span class="error-text">{{ $message }}</span>
                 @enderror
+            </div>
+
+            <div id="preview-section" style="display: none;" class="form-group">
+                <label>Bukti Pembayaran Sudah Diunggah ✅</label>
+                <div class="preview-container">
+                    <img id="preview-image" src="" alt="Preview" class="preview-image">
+                    <div class="preview-info">
+                        <p id="file-name" class="file-name"></p>
+                        <p id="file-size" class="file-size"></p>
+                        <div class="preview-actions">
+                            <button type="button" class="btn-change" onclick="changeFile()">🔄 Ganti Foto</button>
+                            <button type="button" class="btn-delete" onclick="deleteFile()">🗑️ Hapus Foto</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -119,7 +134,7 @@
         </div>
 
         <!-- BUTTON KONFIRMASI -->
-        <button type="submit" class="btn-confirm">✅ Konfirmasi Pesanan & Pembayaran</button>
+        <button type="submit" class="btn-confirm" id="btn-confirm">✅ Konfirmasi Pesanan & Pembayaran</button>
     </form>
 </div>
 
@@ -312,6 +327,75 @@
     font-size: 0.85rem;
 }
 
+.preview-container {
+    background: #f0fdf4;
+    border: 2px solid #86efac;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.preview-image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #2c9a94;
+}
+
+.preview-info {
+    flex: 1;
+}
+
+.file-name {
+    font-weight: 700;
+    color: #2c9a94;
+    margin-bottom: 5px;
+}
+
+.file-size {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+.preview-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-change, .btn-delete {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.btn-change {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-change:hover {
+    background: #2563eb;
+    transform: scale(1.05);
+}
+
+.btn-delete {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #dc2626;
+    transform: scale(1.05);
+}
+
 .items-list {
     background: #f8fafc;
     padding: 15px;
@@ -365,9 +449,14 @@
     box-shadow: 0 4px 12px rgba(44, 154, 148, 0.2);
 }
 
-.btn-confirm:hover {
+.btn-confirm:hover:not(:disabled) {
     transform: translateY(-3px);
     box-shadow: 0 8px 20px rgba(44, 154, 148, 0.3);
+}
+
+.btn-confirm:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .alert {
@@ -405,6 +494,25 @@
         width: 100%;
     }
 
+    .preview-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .preview-image {
+        width: 100%;
+        height: auto;
+    }
+
+    .preview-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .btn-change, .btn-delete {
+        width: 100%;
+    }
+
     .btn-confirm {
         width: calc(100% - 40px);
         margin: 20px;
@@ -415,7 +523,14 @@
 <script>
 const fileInput = document.getElementById('receipt');
 const fileLabel = document.querySelector('.file-label');
+const uploadSection = document.getElementById('upload-section');
+const previewSection = document.getElementById('preview-section');
+const previewImage = document.getElementById('preview-image');
+const fileName = document.getElementById('file-name');
+const fileSize = document.getElementById('file-size');
+const btnConfirm = document.getElementById('btn-confirm');
 
+// Drag and drop
 fileLabel.addEventListener('dragover', (e) => {
     e.preventDefault();
     fileLabel.style.background = '#e8f5f3';
@@ -429,12 +544,55 @@ fileLabel.addEventListener('drop', (e) => {
     e.preventDefault();
     fileInput.files = e.dataTransfer.files;
     fileLabel.style.background = '#f9f9f9';
+    handleFileSelect();
 });
+
+// File input change
+fileInput.addEventListener('change', handleFileSelect);
+
+function handleFileSelect() {
+    if (fileInput.files && fileInput.files[0]) {
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+            previewImage.src = e.target.result;
+            fileName.textContent = file.name;
+            fileSize.textContent = 'Ukuran: ' + (file.size / 1024).toFixed(2) + ' KB';
+            
+            uploadSection.style.display = 'none';
+            previewSection.style.display = 'block';
+            btnConfirm.disabled = false;
+        };
+
+        reader.readAsDataURL(file);
+    }
+}
+
+function changeFile() {
+    fileInput.click();
+}
+
+function deleteFile() {
+    fileInput.value = '';
+    uploadSection.style.display = 'block';
+    previewSection.style.display = 'none';
+    btnConfirm.disabled = true;
+}
 
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => {
         alert('Nomor rekening berhasil disalin!');
     });
 }
+
+// Check if file already selected on page load
+window.addEventListener('load', () => {
+    if (fileInput.files && fileInput.files[0]) {
+        handleFileSelect();
+    } else {
+        btnConfirm.disabled = true;
+    }
+});
 </script>
 @endsection
