@@ -86,6 +86,7 @@
                                         @csrf @method('PUT')
                                         <select name="status" onchange="this.form.submit()" class="status-select {{ $order->status }}">
                                             <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>PENDING</option>
+                                            <option value="waiting_payment" {{ $order->status == 'waiting_payment' ? 'selected' : '' }}>MENUNGGU TRANSFER</option>
                                             <option value="waiting_verification" {{ $order->status == 'waiting_verification' ? 'selected' : '' }}>VERIFIKASI</option>
                                             <option value="completed" {{ $order->status == 'completed' ? 'selected' : '' }}>COMPLETED</option>
                                             <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>CANCELLED</option>
