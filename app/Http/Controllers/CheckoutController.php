@@ -70,7 +70,7 @@ class CheckoutController extends Controller
 
     public function history(Request $request)
     {
-        $phone = $request->get('phone');
+        $phone = $request->input('phone');
         $orders = [];
 
         if ($phone) {

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProductController;
@@ -13,8 +14,8 @@ use App\Http\Controllers\ProfileController;
 
 // --- AUTENTIKASI (PUBLIC) ---
 Route::get('/', function () {
-    if (auth()->check()) {
-        return auth()->user()->role === 'admin' 
+    if (Auth::check()) {
+        return Auth::user()->role === 'admin' 
             ? redirect()->route('admin.dashboard')
             : redirect()->route('dashboard');
     }
@@ -22,7 +23,7 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/register', function () {
-    if (auth()->check()) {
+    if (Auth::check()) {
         return redirect()->route('dashboard');
     }
     return view('landing');
@@ -31,8 +32,8 @@ Route::get('/register', function () {
 Route::post('/register', [AuthController::class, 'register']);
 
 Route::get('/login', function () {
-    if (auth()->check()) {
-        return auth()->user()->role === 'admin' 
+    if (Auth::check()) {
+        return Auth::user()->role === 'admin' 
             ? redirect()->route('admin.dashboard')
             : redirect()->route('dashboard');
     }
@@ -51,7 +52,7 @@ Route::get('/contact', function () {
 })->name('contact');
 
 // --- HALAMAN YANG BUTUH LOGIN ---
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth'])->group(function () {
     
     Route::get('/home', [HomeController::class, 'index'])->name('dashboard');
     
@@ -78,7 +79,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // --- AREA ADMIN (BACKEND) ---
-Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+Route::prefix('admin')->middleware(['auth', 'App\\Http\\Middleware\\IsAdmin'])->group(function () {
     
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     
