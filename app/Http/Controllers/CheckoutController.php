@@ -8,12 +8,12 @@ use Illuminate\Support\Facades\File;
 
 class CheckoutController extends Controller
 {
+
     /**
      * Menampilkan halaman checkout.
      */
     public function index(Request $request) 
     {
-        // 1. Cek jika ada order_id (setelah redirect dari proses checkout)
         if ($request->has('order_id')) {
             $order = Order::find($request->order_id);
             if ($order) {
@@ -21,7 +21,6 @@ class CheckoutController extends Controller
             }
         }
 
-        // 2. Jika tidak ada order_id, tampilkan isi keranjang
         $cart = session()->get('cart', []);
 
         if(empty($cart)) {
@@ -65,62 +64,76 @@ class CheckoutController extends Controller
     }
 
     /**
-     * Memproses upload bukti transfer ke folder PUBLIC (Step 2)
-     * Solusi anti-403 Forbidden
+     * Menampilkan metode pembayaran
      */
-    public function uploadReceipt(Request $request, $id) 
+    public function paymentMethod($orderId)
+    {
+        $order = Order::findOrFail($orderId);
+        return view('payment-method', compact('order'));
+    }
+
+    /**
+     * Proses pembayaran transfer bank
+     */
+    public function processTransfer(Request $request, $orderId)
+    {
+        $order = Order::findOrFail($orderId);
+        $order->update(['status' => 'waiting_verification']);
+        
+        return redirect()->route('order.history')
+                         ->with('success', 'Pesanan dibuat! Silakan transfer ke rekening yang tertera.');
+    }
+
+    /**
+     * Proses pembayaran dengan bukti transfer
+     */
+    public function processPaymentProof(Request $request, $orderId)
     {
         $request->validate([
             'receipt' => 'required|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
-        $order = Order::findOrFail($id);
+        $order = Order::findOrFail($orderId);
 
         if ($request->hasFile('receipt')) {
             $file = $request->file('receipt');
-            
-            // Buat nama file unik
             $filename = time() . '_order_' . $order->id . '.' . $file->getClientOriginalExtension();
             
-            // Pastikan folder public/receipts tersedia
             $path = public_path('receipts');
             if (!File::isDirectory($path)) {
                 File::makeDirectory($path, 0777, true, true);
             }
 
-            // Hapus foto lama di public/receipts jika ada
             if ($order->payment_receipt && File::exists(public_path('receipts/' . $order->payment_receipt))) {
                 File::delete(public_path('receipts/' . $order->payment_receipt));
             }
 
-            // PINDAHKAN FILE LANGSUNG KE PUBLIC
             $file->move($path, $filename);
-
-            // Update database
             $order->update([
                 'payment_receipt' => $filename,
                 'status' => 'waiting_verification'
             ]);
 
-            return redirect()->back()->with('success', 'Bukti pembayaran berhasil diunggah!');
+            return redirect()->route('order.history')
+                             ->with('success', 'Bukti pembayaran berhasil diunggah! Admin akan memverifikasi dalam 1x24 jam.');
         }
 
         return redirect()->back()->with('error', 'Gagal mengunggah bukti pembayaran.');
     }
 
+
+
     public function history(Request $request)
-{
-    $phone = $request->get('phone');
-    $orders = [];
+    {
+        $phone = $request->get('phone');
+        $orders = [];
 
-    if ($phone) {
-        // Cari pesanan berdasarkan nomor whatsapp, urutkan dari yang terbaru
-        $orders = Order::where('whatsapp', $phone)
-                       ->orderBy('created_at', 'desc')
-                       ->get();
+        if ($phone) {
+            $orders = Order::where('whatsapp', $phone)
+                           ->orderBy('created_at', 'desc')
+                           ->get();
+        }
+
+        return view('order-history', compact('orders', 'phone'));
     }
-
-    return view('order-history', compact('orders', 'phone'));
-}
-
 }

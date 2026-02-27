@@ -76,15 +76,22 @@
                                     </a>
                                 @endif
                                 
-                                <form action="{{ route('admin.order.updateStatus', $order->id) }}" method="POST" class="status-form">
-                                    @csrf @method('PUT')
-                                    <select name="status" onchange="this.form.submit()" class="status-select {{ $order->status }}">
-                                        <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>PENDING</option>
-                                        <option value="waiting_verification" {{ $order->status == 'waiting_verification' ? 'selected' : '' }}>VERIFIKASI</option>
-                                        <option value="completed" {{ $order->status == 'completed' ? 'selected' : '' }}>COMPLETED</option>
-                                        <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>CANCELLED</option>
-                                    </select>
-                                </form>
+                                @if($order->status === 'waiting_verification')
+                                    <form action="{{ route('admin.order.verify', $order->id) }}" method="POST" class="verify-form">
+                                        @csrf
+                                        <button type="submit" class="btn-verify">✅ Verifikasi</button>
+                                    </form>
+                                @else
+                                    <form action="{{ route('admin.order.updateStatus', $order->id) }}" method="POST" class="status-form">
+                                        @csrf @method('PUT')
+                                        <select name="status" onchange="this.form.submit()" class="status-select {{ $order->status }}">
+                                            <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>PENDING</option>
+                                            <option value="waiting_verification" {{ $order->status == 'waiting_verification' ? 'selected' : '' }}>VERIFIKASI</option>
+                                            <option value="completed" {{ $order->status == 'completed' ? 'selected' : '' }}>COMPLETED</option>
+                                            <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>CANCELLED</option>
+                                        </select>
+                                    </form>
+                                @endif
                             </div>
                         </td>
 
@@ -120,4 +127,27 @@
         </table>
     </div>
 </div>
+
+<style>
+.btn-verify {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.btn-verify:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.verify-form {
+    display: inline;
+}
+</style>
 @endsection

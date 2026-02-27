@@ -1,100 +1,346 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container" style="padding: 50px 0;">
-
-    {{-- TAMBAHKAN INI: Alert untuk notifikasi sukses/error --}}
-    <div style="max-width: 800px; margin: 0 auto;">
-        @if(session('success'))
-            <div style="background: #d1fae5; color: #065f46; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #10b981;">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div style="background: #fee2e2; color: #991b1b; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #ef4444;">
-                {{ session('error') }}
-            </div>
-        @endif
+<div class="checkout-container">
+    <div class="checkout-header">
+        <h1>🛒 Checkout</h1>
+        <p>Selesaikan pembelian Anda</p>
     </div>
-    
-    {{-- BAGIAN 1: Jika User SUDAH Checkout & Perlu Bayar --}}
+
     @if(isset($order))
-        <div style="max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center;">
-            <h2 style="color: #1e293b; margin-bottom: 10px;">Langkah Terakhir! 🐾</h2>
-            <p style="color: #64748b; margin-bottom: 30px;">Silakan transfer untuk pesanan #HP-{{ $order->id }}</p>
-
-            <div style="background: #f8fafc; padding: 25px; border-radius: 15px; margin-bottom: 30px; text-align: left;">
-                <p style="margin: 0; color: #94a3b8; font-size: 0.9rem;">Transfer ke Rekening BCA:</p>
-                <h3 style="margin: 5px 0; color: #27ae60;">123-456-7890</h3>
-                <p style="margin: 0; font-weight: 600;">a.n HappyPet Store</p>
-                <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 15px 0;">
-                <p style="margin: 0; color: #94a3b8; font-size: 0.9rem;">Total yang harus dibayar:</p>
-                <h2 style="margin: 0; color: #1e293b;">Rp {{ number_format($order->total_price, 0, ',', '.') }}</h2>
-            </div>
-
-            {{-- Cek Status: Jika pending tampilkan form upload, jika sudah upload tampilkan pesan menunggu --}}
-            @if($order->status == 'pending')
-                <form action="{{ route('order.upload_receipt', $order->id) }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div style="margin-bottom: 20px; text-align: left;">
-                        <label style="font-weight: 600; display: block; margin-bottom: 8px;">Upload Foto Struk (JPG/PNG)</label>
-                        <input type="file" name="receipt" class="form-control" required style="width: 100%;">
+        {{-- Order Summary --}}
+        <div class="checkout-content">
+            <div class="order-summary">
+                <h2>📦 Ringkasan Pesanan</h2>
+                
+                <div class="order-details">
+                    <div class="detail-row">
+                        <span>Nama Pemesan:</span>
+                        <strong>{{ $order->name }}</strong>
                     </div>
-                    <button type="submit" style="width: 100%; background: #27ae60; color: white; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">
-                        Konfirmasi Pembayaran
-                    </button>
-                </form>
-            @else
-                <div style="padding: 25px; background: #e0f2fe; color: #0369a1; border-radius: 15px; font-weight: 600; border: 1px dashed #0ea5e9;">
-                    <span style="font-size: 2rem; display: block; margin-bottom: 10px;">⌛</span>
-                    Bukti sudah diunggah.<br>Admin sedang memverifikasi pembayaranmu.
+                    <div class="detail-row">
+                        <span>Alamat Pengiriman:</span>
+                        <strong>{{ $order->address }}</strong>
+                    </div>
+                    <div class="detail-row">
+                        <span>No. WhatsApp:</span>
+                        <strong>{{ $order->whatsapp }}</strong>
+                    </div>
                 </div>
-                <a href="{{ route('product.index') }}" style="display: inline-block; margin-top: 20px; color: #64748b; text-decoration: none; font-size: 14px;">← Kembali Belanja</a>
-            @endif
+
+                <div class="items-list">
+                    <h3>Produk yang Dipesan:</h3>
+                    @foreach($order->items as $item)
+                        <div class="item">
+                            <span>{{ $item['quantity'] }}x {{ $item['name'] }}</span>
+                            <span>Rp {{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }}</span>
+                        </div>
+                    @endforeach
+                </div>
+
+                <div class="total-section">
+                    <div class="total-row">
+                        <span>Total Pembayaran:</span>
+                        <strong class="total-amount">Rp {{ number_format($order->total_price, 0, ',', '.') }}</strong>
+                    </div>
+                </div>
+
+                {{-- Payment Methods --}}
+                <div class="payment-section">
+                    <h3>💳 Metode Pembayaran</h3>
+                    <a href="{{ route('checkout.payment-method', $order->id) }}" class="btn-pay-method">
+                        Pilih Metode Pembayaran
+                    </a>
+                </div>
+            </div>
         </div>
 
-    {{-- BAGIAN 2: Jika User BARU mau Checkout (Form Alamat) --}}
+        <style>
+            .checkout-container {
+                max-width: 800px;
+                margin: 60px auto;
+                padding: 0 20px;
+            }
+
+            .checkout-header {
+                text-align: center;
+                margin-bottom: 40px;
+                animation: slideInDown 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+
+            .checkout-header h1 {
+                font-size: 2rem;
+                font-weight: 800;
+                color: #1e293b;
+                margin-bottom: 8px;
+            }
+
+            .checkout-header p {
+                color: #64748b;
+                font-size: 0.95rem;
+            }
+
+            .checkout-content {
+                animation: fadeInUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+
+            .order-summary {
+                background: white;
+                padding: 30px;
+                border-radius: 16px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+                border: 2px solid #e2e8f0;
+            }
+
+            .order-summary h2 {
+                font-size: 1.3rem;
+                color: #1e293b;
+                margin-bottom: 20px;
+                font-weight: 700;
+            }
+
+            .order-details {
+                background: #f8fafc;
+                padding: 20px;
+                border-radius: 12px;
+                margin-bottom: 25px;
+            }
+
+            .detail-row {
+                display: flex;
+                justify-content: space-between;
+                padding: 10px 0;
+                border-bottom: 1px solid #e2e8f0;
+            }
+
+            .detail-row:last-child {
+                border-bottom: none;
+            }
+
+            .detail-row span {
+                color: #64748b;
+                font-weight: 500;
+            }
+
+            .detail-row strong {
+                color: #1e293b;
+                font-weight: 700;
+            }
+
+            .items-list {
+                margin-bottom: 25px;
+            }
+
+            .items-list h3 {
+                font-size: 1.1rem;
+                color: #1e293b;
+                margin-bottom: 15px;
+                font-weight: 700;
+            }
+
+            .item {
+                display: flex;
+                justify-content: space-between;
+                padding: 12px;
+                background: #f1f5f9;
+                border-radius: 8px;
+                margin-bottom: 10px;
+                font-size: 0.95rem;
+            }
+
+            .item span:first-child {
+                color: #1e293b;
+                font-weight: 600;
+            }
+
+            .item span:last-child {
+                color: #2c9a94;
+                font-weight: 700;
+            }
+
+            .total-section {
+                background: linear-gradient(135deg, #f8fafc 0%, #f0f4f8 100%);
+                padding: 20px;
+                border-radius: 12px;
+                margin-bottom: 25px;
+                border: 2px solid #e2e8f0;
+            }
+
+            .total-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .total-row span {
+                font-size: 1.1rem;
+                color: #1e293b;
+                font-weight: 700;
+            }
+
+            .total-amount {
+                font-size: 1.5rem;
+                color: #2c9a94;
+            }
+
+            .payment-section {
+                margin-bottom: 30px;
+            }
+
+            .payment-section h3 {
+                font-size: 1.1rem;
+                color: #1e293b;
+                margin-bottom: 15px;
+                font-weight: 700;
+            }
+
+            .btn-pay-method {
+                display: inline-block;
+                width: 100%;
+                padding: 14px;
+                background: linear-gradient(135deg, #2c9a94 0%, #1a7a75 100%);
+                color: white;
+                border: none;
+                border-radius: 10px;
+                font-weight: 700;
+                font-size: 1rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                text-align: center;
+                text-decoration: none;
+                box-shadow: 0 4px 12px rgba(44, 154, 148, 0.2);
+            }
+
+            .btn-pay-method:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 20px rgba(44, 154, 148, 0.3);
+            }
+
+            @keyframes slideInDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @media (max-width: 768px) {
+                .checkout-header h1 {
+                    font-size: 1.5rem;
+                }
+
+                .order-summary {
+                    padding: 20px;
+                }
+            }
+        </style>
     @else
-        <h2 style="margin-bottom: 30px;">Formulir Pengiriman 📦</h2>
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 40px;">
-            <form action="{{ route('checkout.process') }}" method="POST" style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+        {{-- Cart Items Display --}}
+        <div class="checkout-form">
+            <h2>📋 Data Pengiriman</h2>
+            <form action="{{ route('checkout.process') }}" method="POST" class="form">
                 @csrf
-                <div style="margin-bottom: 15px;">
+                
+                <div class="form-group">
                     <label>Nama Lengkap</label>
-                    <input type="text" name="name" class="form-control" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ddd;" required>
+                    <input type="text" name="name" placeholder="Masukkan nama Anda" required>
                 </div>
-                <div style="margin-bottom: 15px;">
+
+                <div class="form-group">
                     <label>Alamat Lengkap</label>
-                    <textarea name="address" rows="3" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ddd;" required></textarea>
+                    <textarea name="address" placeholder="Masukkan alamat pengiriman" rows="4" required></textarea>
                 </div>
-                <div style="margin-bottom: 15px;">
-                    <label>Nomor WhatsApp</label>
-                    <input type="text" name="phone" placeholder="0812xxxx" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ddd;" required>
+
+                <div class="form-group">
+                    <label>No. WhatsApp</label>
+                    <input type="tel" name="phone" placeholder="08xx xxxx xxxx" required>
                 </div>
-                <button type="submit" style="width: 100%; background: #27ae60; color: white; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
-                    Konfirmasi Pesanan
-                </button>
+
+                <button type="submit" class="btn-checkout">Lanjut ke Pembayaran</button>
             </form>
-
-            <div style="background: #f9f9f9; padding: 25px; border-radius: 15px; height: fit-content;">
-                <h4 style="margin-bottom: 20px;">Ringkasan Belanja</h4>
-                @php $total = 0 @endphp
-                @foreach($cart as $id => $details)
-                    @php $total += $details['price'] * $details['quantity'] @endphp
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px;">
-                        <span>{{ $details['name'] }} (x{{ $details['quantity'] }})</span>
-                        <span>Rp {{ number_format($details['price'] * $details['quantity'], 0, ',', '.') }}</span>
-                    </div>
-                @endforeach
-                <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;">
-                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 18px;">
-                    <span>Total Tagihan:</span>
-                    <span style="color: #27ae60;">Rp {{ number_format($total, 0, ',', '.') }}</span>
-                </div>
-            </div>
         </div>
-    @endif
 
+        <style>
+            .checkout-form {
+                background: white;
+                padding: 30px;
+                border-radius: 16px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+                border: 2px solid #e2e8f0;
+                max-width: 600px;
+                margin: 0 auto;
+            }
+
+            .checkout-form h2 {
+                font-size: 1.3rem;
+                color: #1e293b;
+                margin-bottom: 25px;
+                font-weight: 700;
+            }
+
+            .form-group {
+                margin-bottom: 20px;
+            }
+
+            .form-group label {
+                display: block;
+                font-weight: 700;
+                color: #1f2937;
+                margin-bottom: 8px;
+            }
+
+            .form-group input,
+            .form-group textarea {
+                width: 100%;
+                padding: 12px;
+                border: 2px solid #e2e8f0;
+                border-radius: 10px;
+                font-size: 0.95rem;
+                font-family: inherit;
+                transition: all 0.3s ease;
+                box-sizing: border-box;
+            }
+
+            .form-group input:focus,
+            .form-group textarea:focus {
+                outline: none;
+                border-color: #2c9a94;
+                box-shadow: 0 0 0 3px rgba(44, 154, 148, 0.1);
+            }
+
+            .btn-checkout {
+                width: 100%;
+                padding: 14px;
+                background: linear-gradient(135deg, #2c9a94 0%, #1a7a75 100%);
+                color: white;
+                border: none;
+                border-radius: 10px;
+                font-weight: 700;
+                font-size: 1rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 12px rgba(44, 154, 148, 0.2);
+            }
+
+            .btn-checkout:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 20px rgba(44, 154, 148, 0.3);
+            }
+        </style>
+    @endif
 </div>
 @endsection

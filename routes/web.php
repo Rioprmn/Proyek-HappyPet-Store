@@ -86,8 +86,9 @@ Route::middleware('auth')->group(function () {
     // --- SISTEM CHECKOUT & PAYMENT (USER) ---
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
-    Route::get('/order/pay/{id}', [CheckoutController::class, 'pay'])->name('order.pay');
-    Route::post('/order/upload/{id}', [CheckoutController::class, 'uploadReceipt'])->name('order.upload_receipt');
+    Route::get('/payment/{id}', [CheckoutController::class, 'paymentMethod'])->name('checkout.payment-method');
+    Route::post('/payment/transfer/{id}', [CheckoutController::class, 'processTransfer'])->name('checkout.process-transfer');
+    Route::post('/payment/proof/{id}', [CheckoutController::class, 'processPaymentProof'])->name('checkout.process-payment-proof');
     Route::get('/my-orders', [CheckoutController::class, 'history'])->name('order.history');
 });
 
@@ -127,6 +128,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     // Manajemen Pesanan (Orders)
     Route::get('/orders', [AdminController::class, 'orderList'])->name('admin.order.list');
     Route::get('/orders/print/{id}', [AdminController::class, 'printReceipt'])->name('admin.order.print');
+    Route::post('/orders/verify/{id}', [AdminController::class, 'verifyPayment'])->name('admin.order.verify');
     Route::delete('/orders/{id}', [AdminController::class, 'orderDelete'])->name('admin.order.delete');
     Route::put('/orders/update-status/{id}', [AdminController::class, 'orderUpdateStatus'])->name('admin.order.updateStatus');
 

@@ -181,6 +181,22 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Pesanan dihapus.');
     }
 
+    public function verifyPayment($id)
+    {
+        $order = Order::findOrFail($id);
+        if ($order->status === 'waiting_verification') {
+            $order->update(['status' => 'completed']);
+            foreach ($order->items as $item) {
+                $product = Product::where('name', $item['name'])->first();
+                if ($product) {
+                    $product->decrement('stock', $item['quantity']);
+                }
+            }
+            return redirect()->back()->with('success', 'Pembayaran berhasil diverifikasi!');
+        }
+        return redirect()->back()->with('error', 'Pesanan tidak dalam status menunggu verifikasi.');
+    }
+
     public function printReceipt($id)
     {
         $order = Order::findOrFail($id);
