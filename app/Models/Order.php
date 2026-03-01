@@ -35,4 +35,9 @@ class Order extends Model
             default => '#64748b',
         };
     }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
 }

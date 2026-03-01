@@ -73,10 +73,10 @@
                 {{-- Profile Dropdown Icon --}}
                 <li class="dropdown" style="margin-left: auto; {{ request()->routeIs('profile.*') ? 'border-bottom: 3px solid #2c9a94;' : '' }}">
                     <a href="#" style="display: flex; align-items: center; gap: 8px; color: {{ request()->routeIs('profile.*') ? '#2c9a94' : '#333' }}; font-weight: bold; font-size: 1.2rem;">
-                        @if(auth()->user()->photo)
-                            <img src="{{ asset('assets/img/profiles/' . auth()->user()->photo) }}" alt="{{ auth()->user()->name }}" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid {{ request()->routeIs('profile.*') ? '#2c9a94' : '#ddd' }};">
+                        @if(auth()->user()->profile_photo)
+                            <img src="{{ asset('assets/img/profiles/' . auth()->user()->profile_photo) }}" alt="{{ auth()->user()->name }}" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid {{ request()->routeIs('profile.*') ? '#2c9a94' : '#ddd' }};">
                         @else
-                            👤
+                            <div style="width: 35px; height: 35px; border-radius: 50%; background: #f0fdf4; border: 2px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">👤</div>
                         @endif
                     </a>
                     <ul class="dropdown-menu" style="right: 0; left: auto; min-width: 200px;">

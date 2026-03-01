@@ -29,7 +29,7 @@ class ProfileController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
-            'photo' => 'nullable|image|max:2048',
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $data = [
@@ -39,13 +39,13 @@ class ProfileController extends Controller
             'address' => $request->address,
         ];
 
-        if ($request->hasFile('photo')) {
-            if ($user->photo && File::exists(public_path('assets/img/profiles/' . $user->photo))) {
-                File::delete(public_path('assets/img/profiles/' . $user->photo));
+        if ($request->hasFile('profile_photo')) {
+            if ($user->profile_photo && File::exists(public_path('assets/img/profiles/' . $user->profile_photo))) {
+                File::delete(public_path('assets/img/profiles/' . $user->profile_photo));
             }
-            $photoName = time() . '_' . Str::slug($user->name) . '.' . $request->photo->extension();
-            $request->photo->move(public_path('assets/img/profiles'), $photoName);
-            $data['photo'] = $photoName;
+            $photoName = time() . '_' . Str::slug($user->name) . '.' . $request->profile_photo->extension();
+            $request->profile_photo->move(public_path('assets/img/profiles'), $photoName);
+            $data['profile_photo'] = $photoName;
         }
 
         $user->update($data);

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Services\WhatsAppService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 
 class CheckoutController extends Controller
 {
@@ -59,12 +61,14 @@ class CheckoutController extends Controller
                 'status' => 'waiting_verification'
             ]);
 
+            WhatsAppService::sendOrderNotification($order, 'waiting_verification');
             session()->forget('cart');
 
             return redirect()->route('order.history')
                              ->with('success', 'Pesanan berhasil dibuat! Menunggu verifikasi pembayaran.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Terjadi kesalahan saat membuat pesanan.');
+            Log::error('Checkout error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
@@ -79,6 +83,7 @@ class CheckoutController extends Controller
             ]);
 
             $orders = Order::where('whatsapp', $phone)
+                           ->with('notifications')
                            ->orderBy('created_at', 'desc')
                            ->get();
         }

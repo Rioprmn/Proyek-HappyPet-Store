@@ -13,8 +13,8 @@
     <div class="profile-card">
         <div class="profile-header">
             <div class="profile-photo-wrapper">
-                @if($user->photo)
-                    <img src="{{ asset('assets/img/profiles/' . $user->photo) }}" alt="{{ $user->name }}" class="profile-photo">
+                @if($user->profile_photo)
+                    <img src="{{ asset('assets/img/profiles/' . $user->profile_photo) }}" alt="{{ $user->name }}" class="profile-photo">
                 @else
                     <div class="profile-photo-placeholder">👤</div>
                 @endif

@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\Post;
 use App\Models\BlogCategory;
+use App\Services\WhatsAppService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
@@ -173,6 +174,7 @@ class AdminController extends Controller
         }
 
         $order->update(['status' => $newStatus]);
+        WhatsAppService::sendOrderNotification($order, $newStatus);
         return redirect()->back()->with('success', 'Status pesanan diperbarui!');
     }
 
@@ -192,6 +194,7 @@ class AdminController extends Controller
                     $product->decrement('stock', $item['quantity']);
                 }
             }
+            WhatsAppService::sendOrderNotification($order, 'completed');
             return redirect()->back()->with('success', 'Pembayaran berhasil diverifikasi!');
         }
         return redirect()->back()->with('error', 'Pesanan tidak dalam status menunggu verifikasi.');

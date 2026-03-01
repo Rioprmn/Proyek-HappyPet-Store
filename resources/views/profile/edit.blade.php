@@ -59,26 +59,24 @@
                 <h3 class="form-section-title">Foto Profil</h3>
 
                 <div class="form-group">
-                    <label for="photo">📷 Pilih Foto Profil</label>
-                    <div class="file-input-wrapper">
-                        <input type="file" id="photo" name="photo" accept="image/*" class="file-input">
-                        <div class="file-input-label">
-                            <span class="file-icon">📸</span>
-                            <span class="file-text">Klik untuk memilih foto atau drag & drop</span>
-                            <span class="file-hint">Format: JPG, PNG, WEBP. Maks: 2MB</span>
+                    <label for="profile_photo" class="photo-upload-label">
+                        <div class="photo-upload-box">
+                            @if($user->profile_photo)
+                                <img id="photoPreview" src="{{ asset('assets/img/profiles/' . $user->profile_photo) }}" alt="Preview" class="photo-preview-img">
+                            @else
+                                <div id="photoPreview" class="photo-placeholder">
+                                    <span class="photo-icon">📸</span>
+                                    <span class="photo-text">Pilih Foto</span>
+                                </div>
+                            @endif
                         </div>
-                    </div>
-                    @error('photo')
+                        <input type="file" id="profile_photo" name="profile_photo" accept="image/jpeg,image/png,image/jpg" class="file-input-hidden">
+                    </label>
+                    <p class="photo-hint">JPG, PNG • Maks 2MB</p>
+                    @error('profile_photo')
                         <div class="error-message">{{ $message }}</div>
                     @enderror
                 </div>
-
-                @if($user->photo)
-                    <div class="photo-preview-section">
-                        <p class="preview-label">Foto Saat Ini:</p>
-                        <img src="{{ asset('assets/img/profiles/' . $user->photo) }}" alt="{{ $user->name }}" class="photo-preview">
-                    </div>
-                @endif
             </div>
 
             <div class="form-actions">
@@ -90,49 +88,86 @@
 </div>
 
 <style>
-    .file-input {
+    .file-input-hidden {
         display: none;
     }
 
-    .file-input-wrapper {
-        position: relative;
+    .photo-upload-label {
         cursor: pointer;
+        display: block;
     }
 
-    .file-input-label {
+    .photo-upload-box {
+        width: 100%;
+        aspect-ratio: 1;
+        border: 2px dashed #2c9a94;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        max-width: 300px;
+        margin: 0 auto 15px;
+    }
+
+    .photo-upload-label:hover .photo-upload-box {
+        border-color: #1a7a75;
+        background: linear-gradient(135deg, #dcfce7 0%, #d1fae5 100%);
+        transform: scale(1.02);
+    }
+
+    .photo-placeholder {
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
-        padding: 40px;
-        border: 2px dashed #2c9a94;
-        border-radius: 12px;
-        background: #f0fdf4;
-        transition: all 0.3s ease;
-        text-align: center;
+        gap: 10px;
+        color: #2c9a94;
     }
 
-    .file-input-wrapper:hover .file-input-label {
-        background: #ecfdf5;
-        border-color: #1a7a75;
+    .photo-icon {
+        font-size: 3rem;
     }
 
-    .file-icon {
-        font-size: 2.5rem;
-        margin-bottom: 10px;
-    }
-
-    .file-text {
-        display: block;
-        color: #1f2937;
+    .photo-text {
         font-weight: 600;
-        margin-bottom: 5px;
+        font-size: 1rem;
     }
 
-    .file-hint {
-        display: block;
+    .photo-preview-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .photo-hint {
+        text-align: center;
         color: #94a3b8;
         font-size: 0.85rem;
+        margin: 0;
     }
 </style>
+
+<script>
+    document.getElementById('profile_photo').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const preview = document.getElementById('photoPreview');
+                if (preview.classList.contains('photo-placeholder')) {
+                    preview.classList.remove('photo-placeholder');
+                    preview.innerHTML = '';
+                }
+                const img = document.createElement('img');
+                img.src = event.target.result;
+                img.className = 'photo-preview-img';
+                preview.innerHTML = '';
+                preview.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
 @endsection
