@@ -11,6 +11,7 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ChatController;
 
 // --- AUTENTIKASI (PUBLIC) ---
 Route::get('/', function () {
@@ -50,6 +51,9 @@ Route::get('/about', function () {
 Route::get('/contact', function () {
     return view('contact');
 })->name('contact');
+
+// --- API ROUTES ---
+Route::post('/api/chat', [ChatController::class, 'chat']);
 
 // --- HALAMAN YANG BUTUH LOGIN ---
 Route::middleware(['auth'])->group(function () {

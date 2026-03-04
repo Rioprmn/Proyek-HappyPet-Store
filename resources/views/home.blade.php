@@ -74,3 +74,5 @@
 </section>
 
 @endsection
+
+@include('components.ai-chat')
