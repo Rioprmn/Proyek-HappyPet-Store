@@ -12,6 +12,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\SupplierController;
 
 // --- AUTENTIKASI (PUBLIC) ---
 Route::get('/', function () {
@@ -135,4 +136,14 @@ Route::prefix('admin')->middleware(['auth', 'App\\Http\\Middleware\\IsAdmin'])->
         Route::delete('/categories/destroy/{id}', [AdminController::class, 'blogCategoryDestroy'])->name('admin.blog.category.destroy');
     });
     Route::get('/admin/report/excel/{period}',[AdminController::class, 'exportExcel'])->name('admin.report.excel');
+
+        // --- Supplier Routes ---
+        Route::prefix('suppliers')->group(function () {
+            Route::get('/', [SupplierController::class, 'index'])->name('admin.suppliers.index');
+            Route::get('/create', [SupplierController::class, 'create'])->name('admin.suppliers.create');
+            Route::post('/store', [SupplierController::class, 'store'])->name('admin.suppliers.store');
+            Route::get('/edit/{id}', [SupplierController::class, 'edit'])->name('admin.suppliers.edit');
+            Route::put('/update/{id}', [SupplierController::class, 'update'])->name('admin.suppliers.update');
+            Route::delete('/delete/{id}', [SupplierController::class, 'destroy'])->name('admin.suppliers.delete');
+        });
 });

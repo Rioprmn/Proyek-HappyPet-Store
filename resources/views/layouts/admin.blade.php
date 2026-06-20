@@ -53,6 +53,14 @@
                     📝 <span>Blog & Edukasi</span>
                 </a>
             </li>
+
+            {{-- Supplier --}}
+            <li>
+                <a href="{{ route('admin.suppliers.index') }}"
+                class="{{ request()->routeIs('admin.suppliers.*') ? 'active' : '' }}">
+                    🚚 <span>Supplier</span>
+                </a>
+            </li>
             
             {{-- Kategori Blog --}}
             <li>
