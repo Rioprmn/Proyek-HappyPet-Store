@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Exports\ReportExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AdminController extends Controller
 {
@@ -236,9 +238,9 @@ class AdminController extends Controller
         if ($period == 'daily') {
             $query->whereDate('created_at', now());
             $title = "Harian (" . now()->format('d M Y') . ")";
-        } elseif ($period == 'weekly') {
-            $query->whereBetween('created_at', [now()->subDays(7), now()]);
-            $title = "Mingguan (7 Hari Terakhir)";
+        } elseif ($period == 'yearly') {
+            $query->whereYear('created_at', now()->year);
+            $title = "Tahunan (" . now()->year . ")";
         } else {
             $query->whereMonth('created_at', now()->month);
             $title = "Bulanan (" . now()->format('F Y') . ")";
@@ -251,6 +253,13 @@ class AdminController extends Controller
         $pdf = Pdf::loadView('admin.report-pdf', compact('orders', 'totalRevenue', 'totalOrders', 'title'));
         return $pdf->download('Laporan_HappyPet_' . $period . '_' . now()->format('d_M_Y') . '.pdf');
     }
+    public function exportExcel($period)
+{
+    return Excel::download(
+        new ReportExport($period),
+        'Laporan_HappyPet_' . $period . '_' . now()->format('d_M_Y') . '.xlsx'
+    );
+}
 
     // --- 6. BLOG & EDUKASI ---
     public function blogList() {
@@ -354,4 +363,6 @@ class AdminController extends Controller
         BlogCategory::findOrFail($id)->delete();
         return redirect()->back()->with('success', 'Kategori blog berhasil dihapus!');
     }
+
+    
 }

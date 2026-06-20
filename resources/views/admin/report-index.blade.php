@@ -33,7 +33,11 @@
         </div>
 
         <a href="{{ route('admin.report.download', 'daily') }}" class="btn-download">
-            📥 Download PDF
+        📥 PDF
+        </a>
+        <br>
+        <a href="{{ route('admin.report.excel', 'daily') }}" class="btn-download">
+            📊 Excel
         </a>
     </div>
 
@@ -54,7 +58,11 @@
         </div>
 
         <a href="{{ route('admin.report.download', 'monthly') }}" class="btn-download">
-            📥 Download PDF
+        📥 PDF
+        </a>
+        <br>
+        <a href="{{ route('admin.report.excel', 'monthly') }}" class="btn-download">
+            📊 Excel
         </a>
     </div>
 
@@ -74,8 +82,12 @@
             <canvas id="miniYearlyChart"></canvas>
         </div>
 
-        <a href="{{ route('admin.report.download', 'monthly') }}" class="btn-download">
-            📥 Download PDF
+        <a href="{{ route('admin.report.download', 'yearly') }}" class="btn-download">
+        📥 PDF
+        </a>
+        <br>
+        <a href="{{ route('admin.report.excel', 'yearly') }}" class="btn-download">
+            📊 Excel
         </a>
     </div>
 

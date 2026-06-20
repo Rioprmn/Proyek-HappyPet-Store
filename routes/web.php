@@ -119,6 +119,7 @@ Route::prefix('admin')->middleware(['auth', 'App\\Http\\Middleware\\IsAdmin'])->
 
     Route::get('/reports', [AdminController::class, 'reportIndex'])->name('admin.report.index');
     Route::get('/reports/download/{period}', [AdminController::class, 'downloadReport'])->name('admin.report.download');
+    
 
     Route::prefix('blog')->group(function () {
         Route::get('/', [AdminController::class, 'blogList'])->name('admin.blog.list');
@@ -133,4 +134,5 @@ Route::prefix('admin')->middleware(['auth', 'App\\Http\\Middleware\\IsAdmin'])->
         Route::post('/categories/store', [AdminController::class, 'blogCategoryStore'])->name('admin.blog.category.store');
         Route::delete('/categories/destroy/{id}', [AdminController::class, 'blogCategoryDestroy'])->name('admin.blog.category.destroy');
     });
+    Route::get('/admin/report/excel/{period}',[AdminController::class, 'exportExcel'])->name('admin.report.excel');
 });
